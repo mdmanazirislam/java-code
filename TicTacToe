@@ -1,0 +1,224 @@
+class TicTacToe{
+  public char [ ] [ ] board;
+  private char player1 = 'X';
+  private char player2 = 'O';
+  private char mainMark;
+  public int[] moveStore;
+  
+  TicTacToe(){
+    board = new char [3] [3];
+    moveStore = new int [9];
+    createBoard();
+    printBoardC();
+    mainMark = 'X';
+  }
+  
+  void createBoard(){
+    int a = 1;
+    for(int i = 0; i < 3; i++){
+      for(int j = 0; j < 3; j++){
+        board [i] [j] = (char)a;
+        a++;
+      }
+    }
+  }
+  
+  public void printBoardC(){
+    for (int i = 0; i < 3; i++) {
+      System.out.print("| ");
+      for (int j = 0; j < 3; j++) {
+        System.out.print((int)board[i][j] + " | ");
+      }
+      System.out.println();
+      if(i < 2){
+        System.out.println("-------------");
+      }
+    }
+  }
+  
+  void printBoard2(){
+    for (int i = 0; i < 3; i++) {
+      System.out.print("| ");
+      for (int j = 0; j < 3; j++) {
+        if(board[i][j] == 'X' || board[i][j] == 'O'){
+          System.out.print(board[i][j] + " | ");
+        }
+        else{
+          System.out.print((int)board[i][j] + " | ");
+        }
+      }
+      System.out.println();
+      if(i < 2){
+        System.out.println("-------------");
+      }
+    }
+  }
+  
+  
+  void switchPlayer(){
+    if(mainMark == 'X'){
+      mainMark = player2;
+    }
+    else if(mainMark == 'O'){
+      mainMark = player1;
+    }
+  }
+  
+  void placeMark(int row, int column){
+    if ((row >= 0) && (row < 3)) {
+      if ((column >= 0) && (column < 3)) {
+        if (board[row][column] != 'X' || board[row][column] != 'O'){
+          board[row][column] = mainMark;
+        }
+      }
+    }
+  }
+  
+  void draw(int inputMove){
+    placeMark(getA(inputMove), getB(inputMove));
+  }
+  
+  int getA(int inputMove){
+    return (inputMove - 1) / 3;
+  }
+  
+  int getB(int inputMove){
+    return (inputMove - 1) % 3;
+  }
+  
+  boolean isValidMove(int move){
+    boolean isValid = true;
+    if(move > 0 && move < 10){
+      for(int i = 0; i < moveStore.length; i++){
+        if(moveStore[i] == move){
+          isValid = false;
+          break;
+        }
+      }
+    } 
+    else {
+      isValid = false;
+    }
+    return isValid;
+  }
+  
+  //for checking win
+  boolean checkIfWins(){
+    return (checkRowsToWin() || checkColumnsToWin() || checkCornersToWin());
+  }
+  
+  private boolean checkRowsToWin(){
+    for (int i = 0; i < 3; i++) {
+      if (checkRowColumn(board[i][0], board[i][1], board[i][2]) == true) {
+        return true;
+      }
+    }
+    return false;
+  }
+  
+  private boolean checkColumnsToWin(){
+    for (int i = 0; i < 3; i++) {
+      if (checkRowColumn(board[0][i], board[1][i], board[2][i])) {
+        return true;
+      }
+    }
+    return false;
+  }
+  
+  private boolean checkCornersToWin(){
+    return (
+            (checkRowColumn(board[0][0], board[1][1], board[2][2])) ||
+            (checkRowColumn(board[0][2], board[1][1], board[2][0]))
+           );
+  }
+  
+  private boolean checkRowColumn(char a, char b, char c) {
+    return (
+            ((a != 'X' || a != 'O')) &&
+            (a == b) &&
+            (b == c)
+           );
+  }
+  
+  void storeMove(int m, int c){
+    moveStore[c] = m;
+  }
+  void clearPreviousMoves(){
+    for(int i = 0; i < moveStore.length; i++){
+      moveStore[i] = 0;
+    }
+  }
+}
+
+
+
+
+
+import java.util.*;
+import static java.lang.System.*;
+
+class TicTacToe_Tester{
+  public static void main(String[] manazir){
+    Scanner sc = new Scanner(in);
+    
+    out.println("Please Enter the Name of Player 1");
+    String userName1 = sc.next();
+    out.println("Please Enter the Name of Player 2");
+    String userName2 = sc.next();
+    out.println("Welcome to TicTacToe "+userName1+" & "+userName2+"!\nThis code was written by Sadik :)");
+    String winner = null;
+    TicTacToe t = new TicTacToe();
+    
+    for(int playAgain = 1; playAgain > -1; playAgain++){
+      int count = 0;
+      for(int i = 1; i < 10; i++){
+        if(i%2!=0){
+          out.println(userName1+", Your Turn!");
+          winner = userName1;
+        }
+        else{
+          out.println(userName2+", Your Turn!");
+          winner = userName2;
+        }
+        int move = sc.nextInt();
+        if(t.isValidMove(move)){
+          t.draw(move);
+          if(t.checkIfWins()){
+            out.println("\nCongratz "+winner+"! You've Won!");
+            t.printBoard2();
+            break;
+          }
+          t.printBoard2();
+          t.switchPlayer();
+        }
+        else{
+          if(move == 99){ //99 will terminate the code
+            break;
+          }
+          out.println("Enter a Valid Field!!!!!");
+          i--;
+        }
+        
+        t.storeMove(move, count);
+        count++;
+        if(move == 9){
+          out.println("\nit s a tie");
+        }
+      }
+      out.println("\n\nDo you wish to play again?");
+      out.println("Enter '1' to Play Again");
+      out.println("Enter '2' to End");
+      int x = sc.nextInt();
+      if(x == 1){
+        out.println("New Game: ");
+        t.createBoard();
+        t.printBoardC();
+        t.clearPreviousMoves();
+      }
+      else{
+        out.println("\nThanks For Playing :)");
+        break;
+      }
+    }
+  }
+}
